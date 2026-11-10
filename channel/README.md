@@ -11,11 +11,13 @@
 
 | Yer | Ne |
 | --- | --- |
-| `episodes/001-gokyuzu-neden-mavi/` | Pilot bölüm: 68 saniye, 6 sahne, müzik ve efektleriyle |
-| `episodes/<bölüm>/bolum.js` | Bölümün senaryosu: anlatım satırları (TR + EN), zamanları, ekrandaki yazılar |
+| `episodes/001-gokyuzu-neden-mavi/` | Pilot bölüm, İngilizce: 69,5 saniye, 6 sahne; anlatımı, müziği ve efektleriyle |
+| `episodes/<bölüm>/bolum.js` | Bölümün bütün verisi: sahneler ve süreleri, anlatım satırları (EN + TR) ve zamanları, ekrandaki yazılar, efektlerin yerleri |
 | `episodes/<bölüm>/shared/kit.js` | Nedo, güneş, renk topları, manzara ve hareket yardımcıları |
+| `araclar/seslendir.py` | Anlatımı seslendirir (Kokoro: anahtarsız, bilgisayarda çalışır) |
 | `araclar/ses.mjs` | Müziği ve ses efektlerini kodla üretir |
-| `araclar/altyazi.mjs` | Senaryodan altyazı (WebVTT) yazar: filmde ve YouTube'da kullanılır |
+| `araclar/kur.mjs` | `film.html`'i `bolum.js`'ten kurar ve seslerin üst üste binmediğini denetler |
+| `araclar/altyazi.mjs` | Anlatımdan YouTube altyazısı (WebVTT) yazar |
 | `sorular.md` | Soru havuzu: 40 soru, çocuğa söylenecek cevap ve görsel fikir |
 
 ## Bölümün biçimi
@@ -45,35 +47,50 @@ Pilot, bu iskeletin 1-2-4-5-7 adımlarından oluşan kısa çekirdeğidir. Asıl
 
 ## Yeni bölüm yapmak
 
-OpenFilm bu depodan çalışır (`pnpm install` bir kez):
+Bir kez kurulur: OpenFilm bu depodan çalışır, ses motoru Python'da.
 
 ```bash
 pnpm install
 ```
 
 ```bash
-cp -r channel/episodes/001-gokyuzu-neden-mavi channel/episodes/002-gokkusagi-nasil-olusur
+pip install kokoro-onnx soundfile
+```
+
+Yeni bölüm, bir öncekinin kopyasından başlar:
+
+```bash
+cp -r channel/episodes/001-gokyuzu-neden-mavi channel/episodes/002-how-is-a-rainbow-made
 ```
 
 Sonra yeni klasörde:
 
-1. `bolum.js`: soruyu, anlatım satırlarını ve sahne sürelerini yaz. Sahneler hareketlerini buradaki
-   saniyelerden (`an('s3-sir')`) kurar; zamanı değiştirmek için yalnızca burası değişir.
+1. `bolum.js`: soruyu, anlatım satırlarını, sahne sürelerini ve efektlerin yerlerini yaz.
 2. Sahne sayfaları (`s1-…html` … `s6-…html`): açıklama sahnelerini yeniden çiz. Soru, başlık ve veda
-   sahneleri çoğu zaman olduğu gibi kalır.
-3. `film.html`: sahnelerin ve seslerin filmdeki yerleri.
-4. Sesleri ve altyazıyı üret, filme bak, render et:
+   sahneleri çoğu zaman olduğu gibi kalır. Sahneler hareketlerini `bolum.js`'teki anlardan kurar
+   (`an('s3-sir')`), süreyi de oradan alır (`sure('s3')`).
+3. Seslendir. Her satırın süresini yazar ve ayrılan yere sığmayanı gösterir; `bolum.js`'teki `at`
+   değerlerini buna göre düzelt.
+4. Müziği üret, filmi kur, bak, render et.
 
 ```bash
-node channel/araclar/ses.mjs channel/episodes/002-gokkusagi-nasil-olusur
+python channel/araclar/seslendir.py channel/episodes/002-how-is-a-rainbow-made --speed 0.85
 ```
 
 ```bash
-node channel/araclar/altyazi.mjs channel/episodes/002-gokkusagi-nasil-olusur
+node channel/araclar/ses.mjs channel/episodes/002-how-is-a-rainbow-made
 ```
 
 ```bash
-cd channel/episodes/002-gokkusagi-nasil-olusur && node ../../../packages/openfilm/bin/openfilm.mjs look
+node channel/araclar/kur.mjs channel/episodes/002-how-is-a-rainbow-made
+```
+
+```bash
+node channel/araclar/altyazi.mjs channel/episodes/002-how-is-a-rainbow-made
+```
+
+```bash
+cd channel/episodes/002-how-is-a-rainbow-made && node ../../../packages/openfilm/bin/openfilm.mjs look
 ```
 
 ```bash
@@ -81,32 +98,36 @@ node ../../../packages/openfilm/bin/openfilm.mjs render --loudness=-14
 ```
 
 `look` her kareyi iki kez, karışık sırayla çizer ve aynı saniyenin aynı resmi verdiğini doğrular; `open`
-filmi Studio'da açar: orada her sahne, yazı ve ses elle değiştirilebilir.
+filmi Studio'da açar: orada her sahne, yazı ve ses elle değiştirilebilir. `kur.mjs` `film.html`'i baştan
+yazdığı için Studio'daki elle ince ayar en sona kalır.
 
 ### Seslendirme
 
-Pilotta seslendirme yok: anlatım şimdilik altyazı olarak görünüyor (`film.html`'in ilk parçası). Ses gelince:
+Anlatım Kokoro ile üretilir (Apache 2.0): anahtar istemez, bilgisayarda çalışır, ürettiği ses ticari işte
+kullanılabilir. Model dosyaları (350 MB) ilk çalıştırmada iner. Yalnızca İngilizce konuşur.
 
-1. Her satır ayrı bir dosya olur: `assets/audio/vo/s1-merhaba.wav` …
-2. `bolum.js`'te her satırın `at` ve `to` değeri gerçek sese göre düzeltilir; gerekirse sahne süresi uzar.
-3. Ses dosyaları `film.html`'e kendi parçalarında eklenir, müziğin `volume` değeri 0,3 dolayına iner.
-4. Altyazı parçası filmden çıkarılır; aynı `.vtt` YouTube'a altyazı olarak yüklenir.
+- Ses seçmek: `seslendir.py <bölüm> --dene af_heart,af_bella,bf_emma,am_puck` her sesle ilk üç satırı
+  `<bölüm>/.dene` içine yazar. Kanalın sesi bir kez seçilir ve değişmez: çocuk Nedo'yu sesinden tanır.
+- `--speed 0.85` küçük çocuk için iyi bir hızdır; `--pitch 2` sesi iki yarım ton inceltir.
+- Her satır ayrı bir dosyadır (`assets/audio/vo/en/s1-merhaba.wav`), sözleri yanındadır (`.vtt`).
+- Renk adları gibi resimle aynı anda söylenmesi gereken kelimeler ayrı satırlardır: her biri kendi anına konur.
 
-İki yol var. **Kendi sesin** (ya da tanıdığın birinin): kanalı en özgün kılan şey budur ve çocuk içeriğinde
-güven verir. **Yapay ses** (ElevenLabs, Google, Azure…): hızlıdır, her dilde aynı karakter konuşur; OpenFilm
-bunları `openfilm get tts` ile kullanır, bunun için servisin anahtarı gerekir.
+Pilottaki ses `af_heart`, hız 0,85. Bir insan sesi (seninki ya da bir seslendirmenin) kanalı daha özgün
+kılar: dosyalar aynı adlarla aynı klasöre konur, gerisi aynıdır.
 
 ### Başka dil
 
-Resimlerde yazı neredeyse yok, o yüzden aynı bölüm başka dile ucuza çevrilir: `bolum.js`'te `dil = 'en'`
-yap, o dilin seslerini koy, yeniden render et. Satırların İngilizcesi şimdiden yazılı.
+Resimlerde yazı neredeyse yok, o yüzden aynı bölüm başka dile ucuza çevrilir. Satırların Türkçesi
+`bolum.js`'te yazılı: `dil = 'tr'` yapınca ekrandaki yazılar Türkçe olur. Türkçe ses Kokoro'dan gelmez;
+kayıt ya da başka bir ses servisi gerekir (dosyalar `assets/audio/vo/tr/` altına). Zamanlar o sese göre
+yeniden düzeltilir.
 
 ## Yayın
 
 - **Biçim**: 1920×1080, 30 kare/sn, ses −14 LUFS (`render --loudness=-14`).
 - **Sıklık**: haftada 2 bölüm, aynı gün ve saatte. İlk hedef 20 bölüm: kanal ancak o zaman değerlendirilebilir.
 - **Küçük resim**: Nedo + sorunun nesnesi + en fazla 3 kelime. `look <saniye>` tam boy kare verir.
-- **Başlık**: sorunun kendisi. “Gökyüzü Neden Mavi? | Nedo ile Neden?”
+- **Başlık**: sorunun kendisi. “Why Is the Sky Blue? | Nedo Asks Why”
 - **Oynatma listeleri**: Gökyüzü, Hayvanlar, Vücudumuz, Doğa, Evde Bilim.
 - **Shorts**: her bölümün “işte bu yüzden” anı dikey olarak ayrıca kesilir (1080×1920).
 
@@ -125,12 +146,12 @@ sayfalarından doğrulanmalı.
   kurgusu olmalı. Bu kanalın şablonu iskelettir; açıklama sahneleri her bölümde baştan çizilir.
 - **Çocuk içeriği kalite ilkeleri**: öğreten, merak uyandıran içerik öne çıkarılır; aşırı ticari, sansasyonel
   ya da otomatik üretilmiş içerik geri plana atılır ve gelirini kaybedebilir.
-- **Dil**: Türkçe'de rakip az ama reklam geliri düşük; İngilizce'de gelir yüksek ama rakip çok. Önerilen:
-  Türkçe başla, tutan bölümleri İngilizce seslendirip ikinci kanalda yayınla.
+- **Dil**: kanal İngilizce: reklam geliri yüksek, izleyici çok, ama rakip de çok. Türkçe'de rakip az,
+  gelir düşük; tutan bölümler Türkçe seslendirilip ikinci bir kanalda yayınlanabilir.
 - **Reklam dışı gelir**: asıl para çoğu çocuk kanalında lisanstan, kitaptan ve oyuncaktan gelir. Bunun için
   Nedo'nun tanınması gerekir; o yüzden her bölümde aynı karakter, aynı renkler, aynı müzik.
 
 ## Haklar
 
 Çizimler, müzik ve ses efektleri bu depodaki koddan üretilir. Yazı tipi Baloo 2, SIL Open Font License 1.1
-ile (`shared/fonts/OFL.txt`).
+ile (`shared/fonts/OFL.txt`). Anlatımın sesi Kokoro-82M modelinden (Apache 2.0).

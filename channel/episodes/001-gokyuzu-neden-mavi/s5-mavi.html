@@ -16,7 +16,7 @@
 </svg>
 <script type="module">
 import { $, prog, ease, pop, bump, lerp, mix, rng, baslat, yazilar, nedoCiz, nedoDurus, topCiz, gokCiz, tepelerCiz, bulutCiz, RENK } from './shared/kit.js';
-import { an } from './bolum.js';
+import { an, sure } from './bolum.js';
 
 $('#gok-yeri').innerHTML = gokCiz();
 $('#tepeler').innerHTML = tepelerCiz();
@@ -41,7 +41,7 @@ const NEREDEN = [[150, 140], [560, 60], [960, 30], [1360, 60], [1770, 140], [60,
 $('#isinlar').innerHTML = NEREDEN.map(([x, y], i) => `<line class="i${i}" x1="${x}" y1="${y}" x2="${lerp(x, GOZLER[0], 0.86).toFixed(1)}" y2="${lerp(y, GOZLER[1], 0.86).toFixed(1)}" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-dasharray="4 44"/>`).join('');
 
 baslat({
-  duration: 12,
+  duration: sure('s5'),
   ready: yazilar(),
   frame(t) {
     // gök soluktan maviye döner

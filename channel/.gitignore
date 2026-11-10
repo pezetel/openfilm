@@ -1,2 +1,4 @@
 # render çıktıları depoya girmez: `openfilm render` ile yeniden üretilir
 episodes/*/*.mp4
+# ses denemeleri (seslendir.py --dene)
+episodes/*/.dene/

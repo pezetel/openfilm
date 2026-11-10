@@ -28,7 +28,7 @@
 <div class="yazi" id="baslik"></div>
 <script type="module">
 import { $, prog, ease, pop, lerp, baslat, yazilar, nedoCiz, nedoDurus } from './shared/kit.js';
-import { yazi } from './bolum.js';
+import { yazi, sure } from './bolum.js';
 
 let dilimler = '';
 for (let i = 0; i < 12; i++) {
@@ -41,7 +41,7 @@ $('#marka').textContent = yazi.marka;
 $('#baslik').textContent = yazi.baslik;
 
 baslat({
-  duration: 3.5,
+  duration: sure('s2'),
   ready: yazilar(),
   frame(t) {
     $('#donen').setAttribute('transform', `rotate(${(t * 7).toFixed(2)})`);

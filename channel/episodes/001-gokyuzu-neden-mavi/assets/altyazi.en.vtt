@@ -1,91 +1,97 @@
 WEBVTT
 
-REGION
-id:main
-width:86%
-lines:3
-regionanchor:50%,100%
-viewportanchor:50%,94%
-
-STYLE
-::cue { font: 700 4.4cqmin/1.25 system-ui, sans-serif; color: #ffffff; background: rgba(43, 33, 64, 0.78); padding: 0.2em 0.7em; border-radius: 0.5em; }
-
 s1-merhaba
-00:00:00.900 --> 00:00:02.500 region:main align:center
+00:00:00.900 --> 00:00:02.220
 Hi! I'm Nedo.
 
 s1-bak
-00:00:02.800 --> 00:00:05.300 region:main align:center
-Today I looked up and wondered…
+00:00:02.800 --> 00:00:04.816
+Today I looked up, and I wondered…
 
 s1-sor
-00:00:05.600 --> 00:00:07.700 region:main align:center
+00:00:05.600 --> 00:00:07.048
 Why is the sky blue?
 
 s3-gunes
-00:00:12.100 --> 00:00:14.400 region:main align:center
+00:00:12.100 --> 00:00:13.600
 The Sun sends us light.
 
 s3-beyaz
-00:00:14.700 --> 00:00:16.700 region:main align:center
+00:00:14.700 --> 00:00:16.019
 The light looks white…
 
 s3-sir
-00:00:17.000 --> 00:00:18.900 region:main align:center
-but it hides a secret!
+00:00:17.000 --> 00:00:18.543
+but it's hiding a secret!
 
 s3-renkler
-00:00:19.200 --> 00:00:21.100 region:main align:center
-All the colors are inside it:
+00:00:19.200 --> 00:00:20.936
+All the colors are inside it!
 
-s3-say
-00:00:21.300 --> 00:00:26.000 region:main align:center
-red, orange, yellow, green, blue, purple!
+s3-kirmizi
+00:00:21.500 --> 00:00:22.214
+Red!
+
+s3-turuncu
+00:00:22.400 --> 00:00:23.239
+Orange!
+
+s3-sari
+00:00:23.300 --> 00:00:24.040
+Yellow!
+
+s3-yesil
+00:00:24.200 --> 00:00:24.969
+Green!
+
+s3-mavi
+00:00:25.100 --> 00:00:25.813
+Blue!
+
+s3-mor
+00:00:26.000 --> 00:00:26.757
+Purple!
 
 s4-hava
-00:00:26.900 --> 00:00:30.300 region:main align:center
-On its way to us, light passes through the air.
+00:00:27.900 --> 00:00:30.822
+On its way to us, the light travels through the air.
 
 s4-tanecik
-00:00:30.700 --> 00:00:34.100 region:main align:center
-The air is full of tiny bits we cannot see.
+00:00:31.400 --> 00:00:35.307
+The air is full of tiny, tiny bits. Too tiny to see!
 
 s4-kirmizi
-00:00:34.500 --> 00:00:37.500 region:main align:center
-Red light goes straight through.
+00:00:35.900 --> 00:00:37.668
+Red light zooms straight through.
 
 s4-mavi
-00:00:38.100 --> 00:00:39.500 region:main align:center
+00:00:39.400 --> 00:00:40.472
 But blue light…
 
-s4-tik
-00:00:39.700 --> 00:00:41.500 region:main align:center
-boing, boing, boing!
-
 s4-ziplar
-00:00:41.900 --> 00:00:45.700 region:main align:center
-It bumps into the tiny bits and bounces everywhere!
+00:00:43.200 --> 00:00:46.419
+It bumps into the tiny bits, and bounces everywhere!
 
 s5-yayilir
-00:00:46.900 --> 00:00:50.700 region:main align:center
+00:00:48.400 --> 00:00:51.255
 The bouncing blue light spreads all over the sky.
 
 s5-goz
-00:00:51.100 --> 00:00:54.500 region:main align:center
-Wherever we look, blue reaches our eyes.
+00:00:52.600 --> 00:00:54.584
+So wherever we look, we see blue!
 
 s5-iste
-00:00:54.900 --> 00:00:57.900 region:main align:center
-And that is why the sky is blue!
+00:00:56.400 --> 00:00:58.160
+And that's why the sky is blue!
 
 s6-biliyoruz
-00:00:58.900 --> 00:01:00.400 region:main align:center
+00:01:00.400 --> 00:01:01.364
 Now we know!
 
 s6-sen
-00:01:00.800 --> 00:01:03.700 region:main align:center
-So, what do you wonder about?
+00:01:02.300 --> 00:01:03.644
+What do you wonder about?
 
 s6-veda
-00:01:04.200 --> 00:01:06.900 region:main align:center
-See you at the next “why”!
+00:01:05.700 --> 00:01:06.932
+See you next time!

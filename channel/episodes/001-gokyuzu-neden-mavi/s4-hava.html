@@ -17,25 +17,25 @@
 </svg>
 <script type="module">
 import { $, prog, ease, pop, bump, lerp, rng, baslat, yazilar, topCiz, gokCiz, tepelerCiz, GOKKUSAGI } from './shared/kit.js';
-import { an } from './bolum.js';
+import { an, sure, carpmalar } from './bolum.js';
 
 $('#gok-yeri').innerHTML = gokCiz();
 $('.gok-ust').setAttribute('stop-color', '#DDE8F8');
 $('.gok-alt').setAttribute('stop-color', '#F6F9FF');
 $('#tepeler').innerHTML = tepelerCiz();
 
-const TANECIK = an('s4-tanecik'), KIRMIZI = an('s4-kirmizi'), MAVI = an('s4-mavi'), TIK = an('s4-tik'), ZIPLAR = an('s4-ziplar');
+const TANECIK = an('s4-tanecik'), KIRMIZI = an('s4-kirmizi'), MAVI = an('s4-mavi');
 
 // altı renk solda sıraya girer; kırmızı (0) ve mavi (4) sırayla yola çıkar
 const SIRA = (i) => [210, 200 + i * 128];
 $('#toplar').innerHTML = GOKKUSAGI.map((c, i) => `<g class="t${i}">${topCiz(c.renk, 46)}</g>`).join('');
 
-// mavinin yolu: [x, y, saniye] — her durak, çarptığı bir tanecik
+// mavinin yolu: [x, y, saniye] — her durak, çarptığı bir tanecik; anlar bolum.js'ten (carpmalar)
+const DURAK = [[600, 500], [900, 220], [1220, 610], [1580, 300], [1150, 140], [820, 560], [1330, 850], [1720, 620]];
 const YOL = [
   [...SIRA(4), MAVI + 0.3],
-  [600, 500, TIK], [900, 220, TIK + 0.7], [1220, 610, TIK + 1.4],
-  [1580, 300, ZIPLAR + 0.1], [1150, 140, ZIPLAR + 0.9], [820, 560, ZIPLAR + 1.7],
-  [1330, 850, ZIPLAR + 2.5], [1720, 620, ZIPLAR + 3.3], [1480, -140, ZIPLAR + 4.6],
+  ...DURAK.map(([x, y], i) => [x, y, carpmalar[i]]),
+  [1480, -140, carpmalar[carpmalar.length - 1] + 1.3],
 ];
 const CARPMA = YOL.slice(1, -1);
 function maviNerede(t) {
@@ -65,7 +65,7 @@ $('#halkalar').innerHTML = CARPMA.map((_, i) => `<circle class="h${i}" fill="non
 const KB = SIRA(0), KS = [2120, 468];           // kırmızının dümdüz yolu
 
 baslat({
-  duration: 20,
+  duration: sure('s4'),
   ready: yazilar(),
   frame(t) {
     // tanecikler belirir ve yerlerinde hafifçe salınır

@@ -1,0 +1,31 @@
+{
+ "voice": "af_heart",
+ "speed": 0.85,
+ "pitch": 0.0,
+ "sureler": {
+  "s1-merhaba": 1.32,
+  "s1-bak": 2.016,
+  "s1-sor": 1.448,
+  "s3-gunes": 1.5,
+  "s3-beyaz": 1.319,
+  "s3-sir": 1.543,
+  "s3-renkler": 1.736,
+  "s3-kirmizi": 0.714,
+  "s3-turuncu": 0.839,
+  "s3-sari": 0.74,
+  "s3-yesil": 0.769,
+  "s3-mavi": 0.713,
+  "s3-mor": 0.757,
+  "s4-hava": 2.922,
+  "s4-tanecik": 3.907,
+  "s4-kirmizi": 1.768,
+  "s4-mavi": 1.072,
+  "s4-ziplar": 3.219,
+  "s5-yayilir": 2.855,
+  "s5-goz": 1.984,
+  "s5-iste": 1.76,
+  "s6-biliyoruz": 0.964,
+  "s6-sen": 1.344,
+  "s6-veda": 1.232
+ }
+}

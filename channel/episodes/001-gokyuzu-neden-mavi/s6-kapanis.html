@@ -21,7 +21,7 @@
 <div class="rozet" id="veda"></div>
 <script type="module">
 import { $, prog, ease, pop, bump, baslat, yazilar, nedoCiz, nedoDurus, gokCiz, tepelerCiz, bulutCiz } from './shared/kit.js';
-import { an, yazi } from './bolum.js';
+import { an, yazi, sure } from './bolum.js';
 
 $('#gok-yeri').innerHTML = gokCiz();
 $('#tepeler').innerHTML = tepelerCiz();
@@ -33,7 +33,7 @@ $('#veda').textContent = yazi.veda;
 const BIL = an('s6-biliyoruz'), SEN = an('s6-sen'), VEDA = an('s6-veda');
 
 baslat({
-  duration: 9.5,
+  duration: sure('s6'),
   ready: yazilar(),
   frame(t) {
     $('.b1').setAttribute('transform', `translate(${(250 + t * 11).toFixed(2)} 420) scale(1.0)`);
@@ -43,7 +43,7 @@ baslat({
     const zipla = bump(t, BIL + 0.2, BIL + 0.85) * 170;
     const ez = bump(t, BIL, BIL + 0.22) * 0.5 - bump(t, BIL + 0.25, BIL + 0.6) * 0.45 + bump(t, BIL + 0.85, BIL + 1.1) * 0.55;
     const sor = pop(t, SEN, 0.6);
-    const el = ease.out(prog(t, VEDA, VEDA + 0.3)) * (1 - ease.inOut(prog(t, 8.6, 9.1)));
+    const el = ease.out(prog(t, VEDA, VEDA + 0.3)) * (1 - ease.inOut(prog(t, sure('s6') - 0.9, sure('s6') - 0.4)));
     nedoDurus($('#nedo'), t, {
       y: -zipla, ez,
       mutlu: (t > BIL && t < SEN) || t > VEDA ? 1 : 0,

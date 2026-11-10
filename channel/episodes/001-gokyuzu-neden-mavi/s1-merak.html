@@ -16,7 +16,7 @@
 </svg>
 <script type="module">
 import { $, prog, ease, bump, pop, lerp, baslat, yazilar, nedoCiz, nedoDurus, gokCiz, tepelerCiz, bulutCiz } from './shared/kit.js';
-import { an } from './bolum.js';
+import { an, sure } from './bolum.js';
 
 $('#gok-yeri').innerHTML = gokCiz();
 $('#tepeler').innerHTML = tepelerCiz();
@@ -26,11 +26,11 @@ $('#nedo').innerHTML = nedoCiz();
 const BAK = an('s1-bak'), SOR = an('s1-sor');
 
 baslat({
-  duration: 8,
+  duration: sure('s1'),
   ready: yazilar(),
   frame(t) {
     // kamera: sahne boyunca hafifçe yaklaşır, soru sorulunca gökyüzüne doğru kayar
-    const yak = 1 + 0.05 * ease.inOut(prog(t, 0, 8));
+    const yak = 1 + 0.05 * ease.inOut(prog(t, 0, sure('s1')));
     const yukari = 26 * ease.inOut(prog(t, BAK, BAK + 1.6));
     $('#kamera').setAttribute('transform', `translate(960 540) scale(${yak.toFixed(4)}) translate(-960 ${(-540 + yukari).toFixed(2)})`);
 

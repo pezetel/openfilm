@@ -99,10 +99,10 @@ const HAVA = {
   kapanis: { akorlar: ['C', 'Am', 'F', 'G'], tel: 0.6, bas: 0.7, ezgi: [...EZGI.slice(0, 3), ['G5', 'A5', 'B5', null]], marimba: 0.55, zil: 0.18, cingirak: 0.05, son: true },
 };
 function muzik() {
-  const toplam = sahneler.reduce((a, [, sn]) => a + sn, 0);
+  const toplam = sahneler.reduce((a, [, , sn]) => a + sn, 0);
   const k = new Kayit(toplam + 0.5);
   let bas0 = 0, sira = 0;
-  for (const [, sn, hava] of sahneler) {
+  for (const [, , sn, hava] of sahneler) {
     const cal = (a, at, kazanc, yon) => { if (at < sn - 0.01) k.koy(a, bas0 + at, kazanc, yon); };
     if (hava === 'baslik') {
       // başlık: soru gibi yükselip havada kalan ezgi (cevabı filmin sonunda gelir)

@@ -6,6 +6,7 @@ node_modules/
 dist/
 .release/
 *.tsbuildinfo
+node-compile-cache/
 
 # from-source runs: their own state, projects and exports (`pnpm dev`, `pnpm dev:desktop`)
 .dev/

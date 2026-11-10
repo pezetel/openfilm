@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>S1 — Nedo merak ediyor</title>
+<link rel="stylesheet" href="shared/kit.css">
+</head>
+<body>
+<svg id="stage" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <g id="kamera">
+    <g id="gok-yeri"></g>
+    <g id="bulutlar"></g>
+    <g id="tepeler"></g>
+    <g id="nedo" transform="translate(800 912)"></g>
+  </g>
+</svg>
+<script type="module">
+import { $, prog, ease, bump, pop, lerp, baslat, yazilar, nedoCiz, nedoDurus, gokCiz, tepelerCiz, bulutCiz } from './shared/kit.js';
+import { an } from './bolum.js';
+
+$('#gok-yeri').innerHTML = gokCiz();
+$('#tepeler').innerHTML = tepelerCiz();
+$('#bulutlar').innerHTML = bulutCiz('b1') + bulutCiz('b2') + bulutCiz('b3');
+$('#nedo').innerHTML = nedoCiz();
+
+const BAK = an('s1-bak'), SOR = an('s1-sor');
+
+baslat({
+  duration: 8,
+  ready: yazilar(),
+  frame(t) {
+    // kamera: sahne boyunca hafifçe yaklaşır, soru sorulunca gökyüzüne doğru kayar
+    const yak = 1 + 0.05 * ease.inOut(prog(t, 0, 8));
+    const yukari = 26 * ease.inOut(prog(t, BAK, BAK + 1.6));
+    $('#kamera').setAttribute('transform', `translate(960 540) scale(${yak.toFixed(4)}) translate(-960 ${(-540 + yukari).toFixed(2)})`);
+
+    $('.b1').setAttribute('transform', `translate(${(300 + t * 14).toFixed(2)} 230) scale(1.15)`);
+    $('.b2').setAttribute('transform', `translate(${(1380 + t * 9).toFixed(2)} 330) scale(0.85)`);
+    $('.b3').setAttribute('transform', `translate(${(1650 - t * 6).toFixed(2)} 150) scale(0.6)`);
+
+    // Nedo gökten düşer, yere esneyerek konar
+    const dusus = ease.in(prog(t, 0, 0.55));
+    const y = lerp(-1150, 0, dusus) - 60 * bump(t, 0.75, 1.15);
+    const ez = bump(t, 0.55, 0.8) * 0.9 - bump(t, 0.8, 1.1) * 0.35;
+    const el = ease.out(prog(t, 0.95, 1.25)) * (1 - ease.inOut(prog(t, 2.3, 2.7)));
+    const bakis = ease.inOut(prog(t, BAK, BAK + 0.7));
+    const sor = pop(t, SOR, 0.6);
+    nedoDurus($('#nedo'), t, {
+      y, ez,
+      sagKol: el, salla: el,
+      mutlu: t > 0.9 && t < 2.6 ? 1 : 0,
+      bak: [0.25 * bakis, -1 * bakis],
+      soru: 1 + 0.45 * sor + 0.05 * sor * Math.sin((t - SOR) * 7),
+      isik: prog(t, BAK + 0.4, BAK + 1.4) * 0.55 + sor * 0.45,
+      solKol: 0.12 * bakis,
+    });
+  },
+});
+</script>
+</body>
+</html>

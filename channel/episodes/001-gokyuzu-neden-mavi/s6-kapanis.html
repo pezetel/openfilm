@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>S6 — Sen neyi merak ediyorsun?</title>
+<link rel="stylesheet" href="shared/kit.css">
+<style>
+  #soru { top: 7vh; font-size: 5.6vw; color: #fff; text-shadow: 0 .42vw 0 rgba(43, 33, 64, .28); }
+  #veda { left: 72%; top: 49vh; font-size: 3.4vw; }
+  #veda::after { content: ""; position: absolute; left: 1.4vw; bottom: -1.3vw; border: 1vw solid transparent; border-top-color: #fff; border-left-color: #fff; border-radius: .2vw; }
+</style>
+</head>
+<body>
+<svg id="stage" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <g id="gok-yeri"></g>
+  <g id="bulutlar"></g>
+  <g id="tepeler"></g>
+  <g id="nedo" transform="translate(960 925) scale(1.12)"></g>
+</svg>
+<div class="yazi" id="soru"></div>
+<div class="rozet" id="veda"></div>
+<script type="module">
+import { $, prog, ease, pop, bump, baslat, yazilar, nedoCiz, nedoDurus, gokCiz, tepelerCiz, bulutCiz } from './shared/kit.js';
+import { an, yazi } from './bolum.js';
+
+$('#gok-yeri').innerHTML = gokCiz();
+$('#tepeler').innerHTML = tepelerCiz();
+$('#bulutlar').innerHTML = bulutCiz('b1') + bulutCiz('b2') + bulutCiz('b3');
+$('#nedo').innerHTML = nedoCiz();
+$('#soru').textContent = yazi.soru;
+$('#veda').textContent = yazi.veda;
+
+const BIL = an('s6-biliyoruz'), SEN = an('s6-sen'), VEDA = an('s6-veda');
+
+baslat({
+  duration: 9.5,
+  ready: yazilar(),
+  frame(t) {
+    $('.b1').setAttribute('transform', `translate(${(250 + t * 11).toFixed(2)} 420) scale(1.0)`);
+    $('.b2').setAttribute('transform', `translate(${(1600 - t * 8).toFixed(2)} 470) scale(0.8)`);
+    $('.b3').setAttribute('transform', `translate(${(1330 + t * 5).toFixed(2)} 600) scale(0.5)`);
+
+    const zipla = bump(t, BIL + 0.2, BIL + 0.85) * 170;
+    const ez = bump(t, BIL, BIL + 0.22) * 0.5 - bump(t, BIL + 0.25, BIL + 0.6) * 0.45 + bump(t, BIL + 0.85, BIL + 1.1) * 0.55;
+    const sor = pop(t, SEN, 0.6);
+    const el = ease.out(prog(t, VEDA, VEDA + 0.3)) * (1 - ease.inOut(prog(t, 8.6, 9.1)));
+    nedoDurus($('#nedo'), t, {
+      y: -zipla, ez,
+      mutlu: (t > BIL && t < SEN) || t > VEDA ? 1 : 0,
+      solKol: bump(t, BIL + 0.1, BIL + 1.2), sagKol: Math.max(bump(t, BIL + 0.1, BIL + 1.2), el), salla: el,
+      bak: [0, -0.15 * prog(t, SEN, SEN + 0.4) * (1 - prog(t, VEDA - 0.3, VEDA))],
+      soru: 1 + 0.45 * sor + 0.04 * sor * Math.sin(t * 6),
+      isik: sor,
+      tohum: 4,
+    });
+
+    $('#soru').style.transform = `scale(${pop(t, SEN + 0.15, 0.55).toFixed(4)})`;
+    $('#soru').style.opacity = prog(t, SEN + 0.15, SEN + 0.3).toFixed(3);
+    $('#veda').style.transform = `translateX(-50%) scale(${pop(t, VEDA + 0.1, 0.5).toFixed(4)})`;
+    $('#veda').style.opacity = prog(t, VEDA + 0.1, VEDA + 0.2).toFixed(3);
+  },
+});
+</script>
+</body>
+</html>

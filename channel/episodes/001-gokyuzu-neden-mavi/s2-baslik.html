@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>S2 — Başlık</title>
+<link rel="stylesheet" href="shared/kit.css">
+<style>
+  #marka { top: 7.5vh; font-size: 2.6vw; }
+  #baslik { top: 60vh; font-size: 7.4vw; color: #2B2140; }
+</style>
+</head>
+<body>
+<svg id="stage" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <rect x="-200" y="-200" width="2320" height="1480" fill="#FFD23F"/>
+  <g id="yelpaze" transform="translate(960 400)"></g>
+  <circle cx="960" cy="400" r="330" fill="#FFE27A"/>
+  <g id="soru" transform="translate(960 400)">
+    <g id="soru-ic">
+      <path d="M-92 -70 C-92 -196 92 -196 92 -70 C92 10 0 14 0 96" stroke="#fff" stroke-width="92" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="0" cy="196" r="58" fill="#fff"/>
+      <path d="M-92 -70 C-92 -196 92 -196 92 -70 C92 10 0 14 0 96" stroke="#FF6B2C" stroke-width="58" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="0" cy="196" r="41" fill="#FF6B2C"/>
+    </g>
+  </g>
+  <g id="nedo" transform="translate(1610 1260) scale(1.25)"></g>
+</svg>
+<div class="rozet" id="marka"></div>
+<div class="yazi" id="baslik"></div>
+<script type="module">
+import { $, prog, ease, pop, lerp, baslat, yazilar, nedoCiz, nedoDurus } from './shared/kit.js';
+import { yazi } from './bolum.js';
+
+let dilimler = '';
+for (let i = 0; i < 12; i++) {
+  const a = (i / 12) * Math.PI * 2, b = a + Math.PI / 12, R = 1500;
+  dilimler += `<path d="M0 0 L${(Math.cos(a) * R).toFixed(1)} ${(Math.sin(a) * R).toFixed(1)} L${(Math.cos(b) * R).toFixed(1)} ${(Math.sin(b) * R).toFixed(1)}Z" fill="#FFC51F"/>`;
+}
+$('#yelpaze').innerHTML = `<g id="donen">${dilimler}</g>`;
+$('#nedo').innerHTML = nedoCiz();
+$('#marka').textContent = yazi.marka;
+$('#baslik').textContent = yazi.baslik;
+
+baslat({
+  duration: 3.5,
+  ready: yazilar(),
+  frame(t) {
+    $('#donen').setAttribute('transform', `rotate(${(t * 7).toFixed(2)})`);
+    const s = pop(t, 0.1, 0.55);
+    const sal = Math.sin(t * 3.2) * 4;
+    $('#soru-ic').setAttribute('transform', `rotate(${sal.toFixed(2)}) scale(${(s * (1 + 0.03 * Math.sin(t * 5))).toFixed(4)})`);
+    const m = pop(t, 0.35, 0.45);
+    $('#marka').style.transform = `translateX(-50%) scale(${m.toFixed(4)})`;
+    const b = pop(t, 0.7, 0.55);
+    $('#baslik').style.transform = `scale(${b.toFixed(4)})`;
+    $('#baslik').style.opacity = prog(t, 0.7, 0.85).toFixed(3);
+    // Nedo sağ alttan başını uzatır
+    const cik = ease.back(prog(t, 1.0, 1.6));
+    $('#nedo').setAttribute('transform', `translate(1640 ${lerp(1560, 1250, cik).toFixed(2)}) scale(1.25)`);
+    nedoDurus($('#nedo'), t, { bak: [-0.9, -0.5], mutlu: 1, soru: 0.001, tohum: 2 });
+  },
+});
+</script>
+</body>
+</html>

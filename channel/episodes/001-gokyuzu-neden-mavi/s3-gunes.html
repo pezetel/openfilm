@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>S3 — Güneş ışığının sırrı</title>
+<link rel="stylesheet" href="shared/kit.css">
+</head>
+<body>
+<svg id="stage" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <g id="gok-yeri"></g>
+  <g id="bulutlar"></g>
+  <g id="seritler"></g>
+  <line id="isik-hale" stroke="#FFF3B0" stroke-width="120" stroke-linecap="round" opacity=".45"/>
+  <line id="isik" stroke="#fff" stroke-width="66" stroke-linecap="round"/>
+  <g id="pirilti"></g>
+  <g id="gunes" transform="translate(360 330)"></g>
+  <g id="toplar"></g>
+</svg>
+<script type="module">
+import { $, $$, prog, ease, pop, bump, lerp, baslat, yazilar, gunesCiz, gunesDurus, topCiz, gokCiz, bulutCiz, GOKKUSAGI } from './shared/kit.js';
+import { an } from './bolum.js';
+
+$('#gok-yeri').innerHTML = gokCiz();
+$('.gok-ust').setAttribute('stop-color', '#2D8CEA');
+$('.gok-alt').setAttribute('stop-color', '#86CBF8');
+$('#bulutlar').innerHTML = bulutCiz('b1') + bulutCiz('b2');
+$('#gunes').innerHTML = `<g id="gunes-ic">${gunesCiz(190)}</g>`;
+
+// ışın: güneşten sağ alta
+const S = [360, 330], E = [1420, 690];
+const uz = Math.hypot(E[0] - S[0], E[1] - S[1]);
+const d = [(E[0] - S[0]) / uz, (E[1] - S[1]) / uz], n = [-d[1], d[0]];
+const A = [S[0] + d[0] * 150, S[1] + d[1] * 150];
+const ARA = 100;                       // şeritlerin uçları arasındaki açıklık
+const uc = (i, k) => [E[0] + n[0] * (i - 2.5) * ARA * k, E[1] + n[1] * (i - 2.5) * ARA * k];
+
+$('#seritler').innerHTML = GOKKUSAGI.map((c, i) => `<line class="alt s${i}" stroke="#fff" stroke-width="46" stroke-linecap="round"/>`).join('')
+  + GOKKUSAGI.map((c, i) => `<line class="ust s${i}" stroke="${c.renk}" stroke-width="32" stroke-linecap="round"/>`).join('');
+$('#toplar').innerHTML = GOKKUSAGI.map((c, i) => `<g class="top t${i}">${topCiz(c.renk, 54)}</g>`).join('');
+const yildiz = 'M0 -30 L8 -8 L30 0 L8 8 L0 30 L-8 8 L-30 0 L-8 -8Z';
+$('#pirilti').innerHTML = Array.from({ length: 7 }, (_, i) => `<path class="p${i}" d="${yildiz}" fill="#FFF7C2"/>`).join('');
+
+const GUNES = an('s3-gunes'), SIR = an('s3-sir'), RENKLER = an('s3-renkler'), SAY = an('s3-say');
+const ADIM = 0.78;                     // renk adları arasındaki süre
+
+baslat({
+  duration: 15,
+  ready: yazilar(),
+  frame(t) {
+    $('.b1').setAttribute('transform', `translate(${(1500 + t * 8).toFixed(2)} 190) scale(0.9)`);
+    $('.b2').setAttribute('transform', `translate(${(980 - t * 6).toFixed(2)} 120) scale(0.55)`);
+
+    $('#gunes-ic').setAttribute('transform', `scale(${pop(t, 0.05, 0.6).toFixed(4)})`);
+    gunesDurus($('#gunes'), t);
+
+    // ışın uzar
+    const boy = ease.inOut(prog(t, GUNES + 0.3, GUNES + 1.9));
+    const B = [lerp(A[0], E[0], boy), lerp(A[1], E[1], boy)];
+    const ayril = ease.inOut(prog(t, RENKLER, RENKLER + 1.5));      // beyaz ışın renklere açılır
+    const titre = bump(t, SIR, SIR + 1.6) * Math.sin(t * 30) * 5;   // "bir sır saklı": ışın kıpırdanır
+    for (const id of ['#isik', '#isik-hale']) {
+      const l = $(id);
+      l.setAttribute('x1', A[0]); l.setAttribute('y1', A[1]);
+      l.setAttribute('x2', (B[0] + n[0] * titre).toFixed(2)); l.setAttribute('y2', (B[1] + n[1] * titre).toFixed(2));
+    }
+    $('#isik').setAttribute('opacity', (boy > 0 ? 1 - ayril : 0).toFixed(3));
+    $('#isik').setAttribute('stroke-width', (66 + 10 * bump(t, SIR, SIR + 1.6)).toFixed(2));
+    $('#isik-hale').setAttribute('opacity', (boy > 0 ? 0.45 * (1 - ayril) : 0).toFixed(3));
+
+    GOKKUSAGI.forEach((c, i) => {
+      const [x, y] = uc(i, ayril);
+      for (const l of $$(`.s${i}`)) {
+        l.setAttribute('x1', A[0]); l.setAttribute('y1', A[1]); l.setAttribute('x2', x.toFixed(2)); l.setAttribute('y2', y.toFixed(2));
+        l.setAttribute('opacity', prog(t, RENKLER, RENKLER + 0.5).toFixed(3));
+      }
+      // adı söylenen renk, şeridinin ucunda bir top olarak belirir ve hoplar
+      const ti = SAY + i * ADIM;
+      const s = pop(t, ti, 0.45);
+      const hop = t > ti ? Math.abs(Math.sin((t - ti) * 3.4)) * 26 * (0.35 + 0.65 * Math.exp(-(t - ti) * 0.8)) : 0;
+      $(`.t${i}`).setAttribute('transform', `translate(${x.toFixed(2)} ${(y - hop).toFixed(2)}) scale(${s.toFixed(4)})`);
+      $(`.t${i}`).setAttribute('opacity', t >= ti ? 1 : 0);
+    });
+
+    // pırıltılar: sır anında ışının üstünde göz kırpar
+    for (let i = 0; i < 7; i++) {
+      const k = 0.14 + i * 0.125, yan = (i % 2 ? 1 : -1) * (58 + (i % 3) * 16);
+      const x = lerp(A[0], E[0], k) + n[0] * yan, y = lerp(A[1], E[1], k) + n[1] * yan;
+      const a = SIR + 0.1 + i * 0.17;
+      const s = bump(t, a, a + 0.9) * (0.7 + 0.25 * (i % 3));
+      $(`.p${i}`).setAttribute('transform', `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${((t - a) * 80).toFixed(2)}) scale(${s.toFixed(4)})`);
+    }
+  },
+});
+</script>
+</body>
+</html>

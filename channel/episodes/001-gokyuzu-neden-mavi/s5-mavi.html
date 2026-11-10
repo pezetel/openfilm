@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>S5 — Gökyüzü maviye dolar</title>
+<link rel="stylesheet" href="shared/kit.css">
+</head>
+<body>
+<svg id="stage" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <g id="gok-yeri"></g>
+  <g id="bulutlar"></g>
+  <g id="isinlar"></g>
+  <g id="toplar"></g>
+  <g id="tepeler"></g>
+  <g id="nedo" transform="translate(960 915)"></g>
+</svg>
+<script type="module">
+import { $, prog, ease, pop, bump, lerp, mix, rng, baslat, yazilar, nedoCiz, nedoDurus, topCiz, gokCiz, tepelerCiz, bulutCiz, RENK } from './shared/kit.js';
+import { an } from './bolum.js';
+
+$('#gok-yeri').innerHTML = gokCiz();
+$('#tepeler').innerHTML = tepelerCiz();
+$('#bulutlar').innerHTML = bulutCiz('b1') + bulutCiz('b2') + bulutCiz('b3');
+$('#nedo').innerHTML = nedoCiz();
+
+const GOZ = an('s5-goz'), ISTE = an('s5-iste');
+const MAVI = '#3D8BFF';
+
+// zıplayan mavi toplar: yerleri ve hızları tohumlu; duvarlardan sekme üçgen dalgayla, yalnızca t'den
+const ucgen = (u, a, b) => { const g = b - a, m = ((u - a) % (2 * g) + 2 * g) % (2 * g); return a + (m < g ? m : 2 * g - m); };
+const r = rng(21);
+const TOP = Array.from({ length: 42 }, (_, i) => {
+  const aci = r() * Math.PI * 2, hiz = 250 + r() * 230, c = 17 + r() * 20;
+  return { x0: 200 + r() * 1500, y0: 90 + r() * 520, vx: Math.cos(aci) * hiz, vy: Math.sin(aci) * hiz, c, a: 0.25 + i * 0.105, yuz: c > 28 };
+});
+$('#toplar').innerHTML = TOP.map((p, i) => `<g class="t${i}"><circle r="${(p.c * 2.6).toFixed(1)}" fill="${MAVI}" opacity=".16"/>${topCiz(MAVI, p.c, p.yuz)}</g>`).join('');
+
+// gökten Nedo'nun gözlerine gelen mavi ışık
+const GOZLER = [960, 715];
+const NEREDEN = [[150, 140], [560, 60], [960, 30], [1360, 60], [1770, 140], [60, 470], [1860, 470]];
+$('#isinlar').innerHTML = NEREDEN.map(([x, y], i) => `<line class="i${i}" x1="${x}" y1="${y}" x2="${lerp(x, GOZLER[0], 0.86).toFixed(1)}" y2="${lerp(y, GOZLER[1], 0.86).toFixed(1)}" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-dasharray="4 44"/>`).join('');
+
+baslat({
+  duration: 12,
+  ready: yazilar(),
+  frame(t) {
+    // gök soluktan maviye döner
+    const k = ease.inOut(prog(t, 0.6, 7.6));
+    $('.gok-ust').setAttribute('stop-color', mix('#DDE8F8', RENK.gokUst, k));
+    $('.gok-alt').setAttribute('stop-color', mix('#F6F9FF', RENK.gokAlt, k));
+
+    const erir = prog(t, ISTE, ISTE + 1.6);            // toplar gökyüzüne karışır
+    TOP.forEach((p, i) => {
+      const x = ucgen(p.x0 + p.vx * t, 50, 1870), y = ucgen(p.y0 + p.vy * t, 50, 690);
+      const e = $(`.t${i}`);
+      e.setAttribute('transform', `translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${(pop(t, p.a, 0.4) * (1 + 0.5 * erir)).toFixed(4)})`);
+      e.setAttribute('opacity', (t >= p.a ? 1 - erir : 0).toFixed(3));
+    });
+
+    NEREDEN.forEach((_, i) => {
+      const e = $(`.i${i}`), a = GOZ + 0.4 + i * 0.12;
+      e.setAttribute('stroke-dashoffset', (-t * 150).toFixed(2));
+      e.setAttribute('opacity', (0.85 * prog(t, a, a + 0.4) * (1 - prog(t, ISTE - 0.3, ISTE + 0.3))).toFixed(3));
+    });
+
+    // bulutlar "işte bu yüzden"de belirir
+    [[330, 210, 1.1], [1500, 260, 0.9], [1010, 130, 0.6]].forEach(([x, y, s], i) => {
+      $(`.b${i + 1}`).setAttribute('transform', `translate(${(x + t * (8 - i * 5)).toFixed(2)} ${y}) scale(${(s * pop(t, ISTE + 0.7 + i * 0.25, 0.5)).toFixed(4)})`);
+    });
+
+    // Nedo: yukarı bakar, sonra sağa sola, sonunda sevinçle zıplar
+    const tara = prog(t, GOZ, GOZ + 0.5) * (1 - prog(t, ISTE - 0.4, ISTE));
+    const bx = Math.sin((t - GOZ) * 2.0) * tara;
+    const zipla = bump(t, ISTE + 0.25, ISTE + 0.95) * 190 + bump(t, ISTE + 1.2, ISTE + 1.8) * 120;
+    const ez = bump(t, ISTE + 0.05, ISTE + 0.3) * 0.5 - bump(t, ISTE + 0.3, ISTE + 0.7) * 0.5 + bump(t, ISTE + 0.95, ISTE + 1.2) * 0.6 - bump(t, ISTE + 1.25, ISTE + 1.6) * 0.4 + bump(t, ISTE + 1.8, ISTE + 2.05) * 0.5;
+    const sevinc = prog(t, ISTE + 0.1, ISTE + 0.4);
+    nedoDurus($('#nedo'), t, {
+      y: -zipla, ez,
+      bak: [bx * 0.9, lerp(-1, -0.25, sevinc) + 0.35 * Math.abs(bx)],
+      mutlu: t > ISTE ? 1 : 0,
+      solKol: sevinc, sagKol: sevinc,
+      isik: sevinc, soru: 1 + 0.25 * sevinc,
+    });
+  },
+});
+</script>
+</body>
+</html>

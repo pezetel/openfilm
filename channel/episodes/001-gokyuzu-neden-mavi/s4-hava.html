@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>S4 — Mavi ışık zıplar</title>
+<link rel="stylesheet" href="shared/kit.css">
+</head>
+<body>
+<svg id="stage" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <g id="gok-yeri"></g>
+  <g id="tepeler" transform="translate(0 170)"></g>
+  <line id="iz-kirmizi" stroke="#FF4D4D" stroke-width="16" stroke-linecap="round"/>
+  <polyline id="iz-mavi" fill="none" stroke="#3D8BFF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" opacity=".5"/>
+  <g id="tanecikler"></g>
+  <g id="halkalar"></g>
+  <g id="toplar"></g>
+</svg>
+<script type="module">
+import { $, prog, ease, pop, bump, lerp, rng, baslat, yazilar, topCiz, gokCiz, tepelerCiz, GOKKUSAGI } from './shared/kit.js';
+import { an } from './bolum.js';
+
+$('#gok-yeri').innerHTML = gokCiz();
+$('.gok-ust').setAttribute('stop-color', '#DDE8F8');
+$('.gok-alt').setAttribute('stop-color', '#F6F9FF');
+$('#tepeler').innerHTML = tepelerCiz();
+
+const TANECIK = an('s4-tanecik'), KIRMIZI = an('s4-kirmizi'), MAVI = an('s4-mavi'), TIK = an('s4-tik'), ZIPLAR = an('s4-ziplar');
+
+// altı renk solda sıraya girer; kırmızı (0) ve mavi (4) sırayla yola çıkar
+const SIRA = (i) => [210, 200 + i * 128];
+$('#toplar').innerHTML = GOKKUSAGI.map((c, i) => `<g class="t${i}">${topCiz(c.renk, 46)}</g>`).join('');
+
+// mavinin yolu: [x, y, saniye] — her durak, çarptığı bir tanecik
+const YOL = [
+  [...SIRA(4), MAVI + 0.3],
+  [600, 500, TIK], [900, 220, TIK + 0.7], [1220, 610, TIK + 1.4],
+  [1580, 300, ZIPLAR + 0.1], [1150, 140, ZIPLAR + 0.9], [820, 560, ZIPLAR + 1.7],
+  [1330, 850, ZIPLAR + 2.5], [1720, 620, ZIPLAR + 3.3], [1480, -140, ZIPLAR + 4.6],
+];
+const CARPMA = YOL.slice(1, -1);
+function maviNerede(t) {
+  if (t <= YOL[0][2]) return [YOL[0][0], YOL[0][1], 0];
+  for (let i = 1; i < YOL.length; i++) {
+    if (t <= YOL[i][2]) {
+      const k = prog(t, YOL[i - 1][2], YOL[i][2]);
+      return [lerp(YOL[i - 1][0], YOL[i][0], k), lerp(YOL[i - 1][1], YOL[i][1], k), i - 1];
+    }
+  }
+  const s = YOL[YOL.length - 1];
+  return [s[0], s[1], YOL.length - 1];
+}
+
+// küçük tanecikler: hep aynı yerlerde (tohumlu), solda bekleyen topların üstüne gelmesin
+const r = rng(7);
+const KUCUK = [];
+while (KUCUK.length < 54) {
+  const x = 360 + r() * 1500, y = 70 + r() * 860, c = 8 + r() * 7, f = r() * 6.28;
+  if (CARPMA.some(([px, py]) => Math.hypot(px - x, py - y) < 90)) continue;
+  KUCUK.push({ x, y, c, f, a: TANECIK + 0.1 + r() * 2.4 });
+}
+$('#tanecikler').innerHTML = KUCUK.map((_, i) => `<circle class="k${i}" fill="#B8C6EA"/>`).join('')
+  + CARPMA.map((_, i) => `<g class="b${i}"><circle r="24" fill="#9FB0E0"/><circle cx="-7" cy="-8" r="7" fill="#fff" opacity=".7"/></g>`).join('');
+$('#halkalar').innerHTML = CARPMA.map((_, i) => `<circle class="h${i}" fill="none" stroke="#3D8BFF" stroke-width="10"/>`).join('');
+
+const KB = SIRA(0), KS = [2120, 468];           // kırmızının dümdüz yolu
+
+baslat({
+  duration: 20,
+  ready: yazilar(),
+  frame(t) {
+    // tanecikler belirir ve yerlerinde hafifçe salınır
+    KUCUK.forEach((p, i) => {
+      const e = $(`.k${i}`);
+      e.setAttribute('cx', (p.x + Math.sin(t * 1.2 + p.f) * 7).toFixed(2));
+      e.setAttribute('cy', (p.y + Math.cos(t * 1.0 + p.f * 1.3) * 7).toFixed(2));
+      e.setAttribute('r', (p.c * pop(t, p.a, 0.4)).toFixed(2));
+    });
+    CARPMA.forEach(([x, y, ts], i) => {
+      const s = pop(t, TANECIK + 0.3 + i * 0.22, 0.45) * (1 + 0.45 * bump(t, ts, ts + 0.35));
+      $(`.b${i}`).setAttribute('transform', `translate(${(x + Math.sin(t * 1.1 + i) * 4).toFixed(2)} ${(y + Math.cos(t * 0.9 + i * 2) * 4).toFixed(2)}) scale(${s.toFixed(4)})`);
+      const h = $(`.h${i}`), k = prog(t, ts, ts + 0.55);
+      h.setAttribute('cx', x); h.setAttribute('cy', y);
+      h.setAttribute('r', (24 + 90 * ease.out(k)).toFixed(2));
+      h.setAttribute('opacity', (t >= ts && k < 1 ? 1 - k : 0).toFixed(3));
+    });
+
+    // toplar soldan girip sıraya dizilir
+    GOKKUSAGI.forEach((c, i) => {
+      const [sx, sy] = SIRA(i);
+      const gir = ease.out(prog(t, 0.3 + i * 0.13, 1.5 + i * 0.13));
+      let x = lerp(-140, sx, gir), y = sy + Math.sin(t * 2.1 + i * 0.9) * 7, s = 1;
+      if (i === 0 && t > KIRMIZI + 0.3) {              // kırmızı: dümdüz
+        const k = prog(t, KIRMIZI + 0.3, KIRMIZI + 2.9);
+        x = lerp(KB[0], KS[0], k); y = lerp(KB[1], KS[1], k);
+      }
+      if (i === 4 && t > YOL[0][2]) {                  // mavi: tanecikten taneciğe
+        [x, y] = maviNerede(t);
+        s = 1 + 0.22 * Math.max(0, ...CARPMA.map(([, , ts]) => bump(t, ts - 0.02, ts + 0.25)));
+      }
+      if (i === 0) s = 1 + 0.2 * bump(t, KIRMIZI, KIRMIZI + 0.4);
+      if (i === 4 && t <= YOL[0][2]) s = 1 + 0.2 * bump(t, MAVI, MAVI + 0.4);
+      $(`.t${i}`).setAttribute('transform', `translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${s.toFixed(4)})`);
+    });
+
+    // izler
+    const kk = prog(t, KIRMIZI + 0.3, KIRMIZI + 2.9);
+    const iz = $('#iz-kirmizi');
+    iz.setAttribute('x1', KB[0]); iz.setAttribute('y1', KB[1]);
+    iz.setAttribute('x2', lerp(KB[0], KS[0], kk).toFixed(2)); iz.setAttribute('y2', lerp(KB[1], KS[1], kk).toFixed(2));
+    iz.setAttribute('opacity', (t > KIRMIZI + 0.3 ? 0.5 * (1 - prog(t, MAVI - 0.4, MAVI + 0.6)) : 0).toFixed(3));
+    const [mx, my, son] = maviNerede(t);
+    const noktalar = YOL.slice(0, son + 1).map(([x, y]) => `${x},${y}`);
+    noktalar.push(`${mx.toFixed(2)},${my.toFixed(2)}`);
+    $('#iz-mavi').setAttribute('points', noktalar.join(' '));
+  },
+});
+</script>
+</body>
+</html>

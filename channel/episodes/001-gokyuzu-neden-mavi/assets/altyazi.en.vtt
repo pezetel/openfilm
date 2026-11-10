@@ -1,0 +1,91 @@
+WEBVTT
+
+REGION
+id:main
+width:86%
+lines:3
+regionanchor:50%,100%
+viewportanchor:50%,94%
+
+STYLE
+::cue { font: 700 4.4cqmin/1.25 system-ui, sans-serif; color: #ffffff; background: rgba(43, 33, 64, 0.78); padding: 0.2em 0.7em; border-radius: 0.5em; }
+
+s1-merhaba
+00:00:00.900 --> 00:00:02.500 region:main align:center
+Hi! I'm Nedo.
+
+s1-bak
+00:00:02.800 --> 00:00:05.300 region:main align:center
+Today I looked up and wondered…
+
+s1-sor
+00:00:05.600 --> 00:00:07.700 region:main align:center
+Why is the sky blue?
+
+s3-gunes
+00:00:12.100 --> 00:00:14.400 region:main align:center
+The Sun sends us light.
+
+s3-beyaz
+00:00:14.700 --> 00:00:16.700 region:main align:center
+The light looks white…
+
+s3-sir
+00:00:17.000 --> 00:00:18.900 region:main align:center
+but it hides a secret!
+
+s3-renkler
+00:00:19.200 --> 00:00:21.100 region:main align:center
+All the colors are inside it:
+
+s3-say
+00:00:21.300 --> 00:00:26.000 region:main align:center
+red, orange, yellow, green, blue, purple!
+
+s4-hava
+00:00:26.900 --> 00:00:30.300 region:main align:center
+On its way to us, light passes through the air.
+
+s4-tanecik
+00:00:30.700 --> 00:00:34.100 region:main align:center
+The air is full of tiny bits we cannot see.
+
+s4-kirmizi
+00:00:34.500 --> 00:00:37.500 region:main align:center
+Red light goes straight through.
+
+s4-mavi
+00:00:38.100 --> 00:00:39.500 region:main align:center
+But blue light…
+
+s4-tik
+00:00:39.700 --> 00:00:41.500 region:main align:center
+boing, boing, boing!
+
+s4-ziplar
+00:00:41.900 --> 00:00:45.700 region:main align:center
+It bumps into the tiny bits and bounces everywhere!
+
+s5-yayilir
+00:00:46.900 --> 00:00:50.700 region:main align:center
+The bouncing blue light spreads all over the sky.
+
+s5-goz
+00:00:51.100 --> 00:00:54.500 region:main align:center
+Wherever we look, blue reaches our eyes.
+
+s5-iste
+00:00:54.900 --> 00:00:57.900 region:main align:center
+And that is why the sky is blue!
+
+s6-biliyoruz
+00:00:58.900 --> 00:01:00.400 region:main align:center
+Now we know!
+
+s6-sen
+00:01:00.800 --> 00:01:03.700 region:main align:center
+So, what do you wonder about?
+
+s6-veda
+00:01:04.200 --> 00:01:06.900 region:main align:center
+See you at the next “why”!

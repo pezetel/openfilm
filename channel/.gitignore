@@ -1,0 +1,2 @@
+# render çıktıları depoya girmez: `openfilm render` ile yeniden üretilir
+episodes/*/*.mp4
